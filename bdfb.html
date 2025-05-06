@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Banco Imobiliário - Indústria BRF & Aurora Multiplayer QR</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pO1UqBQTpKtQiU6Mv4UYq4N1UQvj3q/6REnr5jzOpovYYHicSWiMdT4xw3ckfK14Pjp5lQiG5eZGGsnLs+a6cw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #1a1a1a;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    header {
+      width: 100%;
+      padding: 10px 0;
+      background: #222;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: 1.5px;
+      border-bottom: 3px solid #008740;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(11, 1fr);
+      grid-template-rows: repeat(11, 1fr);
+      width: 95vmin;
+      height: 95vmin;
+      max-width: 900px;
+      max-height: 900px;
+      background: #fefefe;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #008740cc;
+      user-select: none;
+      position: relative;
+    }
+    .cell {
+      border: 1px solid #777;
+      background: #ffffffdd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: calc(0.9rem + 0.5vw);
+      text-align: center;
+      position: relative;
+      padding: 4px;
+      line-height: 1.2;
+      white-space: normal;
+      color: #222;
+    }
+    .corner {
+      background: #008740;
+      color: #fff;
+      font-weight: 800;
+      font-size: calc(1.1rem + 0.5vw);
+    }
+    .residencia {
+      background: #6abd45;
+      color: #fff;
+      font-weight: 600;
+    }
+    .industria {
+      background: #f39c12;
+      color: #fff;
+      font-weight: 600;
+    }
+    .especial {
+      background: #e74c3c;
+      color: #fff;
+      font-weight: 700;
+    }
+    #controls {
+      width: 95vmin;
+      max-width: 900px;
+      max-height: 250px;
+      background: #222;
+      color: #eee;
+      padding: 10px 16px;
+      margin-top: 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px #008740cc inset;
+      display: flex;
+      flex-direction: column;
+      font-size: 1rem;
+    }
+    #connect-panel {
+      margin-bottom: 12px;
+    }
+    #connect-btns {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 8px 0;
+    }
+    #connect-btns button {
+      cursor: pointer;
+      flex-grow: 1;
+      padding: 12px 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #eee;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #008740cc;
+      transition: background 0.3s ease;
+      user-select: none;
+      background: #008740;
+    }
+    #connect-btns button.join-btn {
+      background: #004d00;
+    }
+    #qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    #qr-section > div {
+      margin: 6px 0;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    #qr-code {
+      width: 260px;
+      height: 260px;
+      user-select: none;
+    }
+    #camera-video {
+      display: none;
+      width: 260px;
+      height: 260px;
+      border-radius: 12px;
+      border: 1px solid #444;
+      background: black;
+      user-select: none;
+    }
+    #scan-result {
+      max-width: 260px;
+      word-break: break-word;
+      color: #0f0;
+      font-weight: 700;
+      margin-top: 12px;
+      user-select: text;
+    }
+    #stop-scan-btn {
+      margin-top: 8px;
+      background: #aa2222;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 10px 18px;
+      cursor: pointer;
+      user-select: none;
+      display: none;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    #dice-roll-btn {
+      background: #008740;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      padding: 14px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 0 12px #009e50;
+      transition: background 0.3s ease;
+      margin-top: 4px;
+    }
+    #dice-roll-btn:disabled {
+      background: #555;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    #dice-result {
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: #00ff44;
+      margin-top: 6px;
+      text-align: center;
+      user-select: none;
+    }
+    #player-info {
+      margin-top: 12px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    .player-card {
+      background: #111;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #008740cc inset;
+      position: relative;
+    }
+    .player-name {
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 1.1rem;
+    }
+    .player-balance {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+    .property-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .property-list span {
+      font-size: 0.9rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: #006622bb;
+      user-select: text;
+    }
+    .player-current {
+      outline: 3px solid #00ff00;
+      box-shadow: 0 0 12px #00ff00;
+    }
+    .token {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #222;
+      box-shadow: 0 0 6px #000a inset;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    .p1 {
+      background: #f44336;
+    }
+    .p2 {
+      background: #2196f3;
+    }
+    .p3 {
+      background: #ffeb3b;
+    }
+    .p4 {
+      background: #4caf50;
+    }
+    @media (max-width: 600px) {
+      .board {
+        width: 95vw;
+        height: 95vw;
+      }
+      #qr-code, #camera-video {
+        width: 90vw;
+        height: 90vw;
+      }
+      #player-info {
+        font-size: 0.9rem;
+      }
+      .cell {
+        font-size: 0.8rem;
+        padding: 2px;
+      }
+      #dice-roll-btn {
+        font-size: 1.1rem;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>Banco Imobiliário - Indústria BRF & Aurora Multiplayer QR</header>
+
+  <div class="board" id="board" aria-label="Banco Imobiliário board"></div>
+
+  <div id="controls">
+    <div id="connect-panel" aria-live="polite">
+      <div><strong>Conectar via QR Code</strong></div>
+      <div id="connect-btns">
+        <button id="host-btn" aria-label="Hospedar jogo">Hospedar</button>
+        <button id="join-btn" aria-label="Entrar no jogo">Entrar</button>
+      </div>
+      <div id="qr-section" style="display:none;">
+        <div id="qr-label"></div>
+        <div id="qr-code"></div>
+        <video id="camera-video" autoplay muted playsinline></video>
+        <button id="stop-scan-btn">Parar de escanear</button>
+        <div id="scan-result" aria-live="polite" aria-atomic="true"></div>
+      </div>
+      <div id="connect-status"></div>
+    </div>
+
+    <button id="dice-roll-btn" aria-live="polite" aria-label="Lançar Dados" disabled>Lançar Dados</button>
+    <div id="dice-result" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="player-info" tabindex="0" aria-label="Informações dos jogadores"></div>
+  </div>
+
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <div id="modal-content">
+      <h2 id="modal-title"></h2>
+      <p id="modal-desc"></p>
+      <div id="modal-buttons">
+        <button id="buy-btn" class="modal-btn buy">Comprar</button>
+        <button id="pass-btn" class="modal-btn pass">Passar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script>
+    (() => {
+      "use strict";
+      // Board layout cells data (matching your named cells in the HTML you provided)
+      // We map them in order for 11x11 grid distribution on edges, filling the inner cells empty
+      const boardSpaces = [
+        { id: 0, name: "Início", type: "corner" },
+        { id: 1, name: "Chácara Leiteira do Zé", type: "residencia" },
+        { id: 2, name: "Granja Esperança", type: "residencia" },
+        { id: 3, name: "Mercado e Clima", type: "especial" },
+        { id: 4, name: "Horta Orgânica VerdeVida", type: "residencia" },
+        { id: 5, name: "CooperFrango Ltda.", type: "industria" },
+        { id: 6, name: "Imposto", type: "especial" },
+        { id: 7, name: "Laticínios Boa Aurora", type: "industria" },
+        { id: 8, name: "Clima", type: "especial" },
+        { id: 9, name: "Sítio Vale do Frango", type: "residencia" },
+        { id: 10, name: "Prisão", type: "corner" },
+
+        { id: 11, name: "Sítio Por do Sol", type: "residencia" }, // right column
+
+        { id: 20, name: "Estacionamento", type: "corner" },
+        { id: 21, name: "Fábrica de Embutidos Premium", type: "industria" },
+        { id: 22, name: "Unidade Aurora Norte", type: "industria" },
+        { id: 23, name: "Sorte ou Reves", type: "especial" },
+        { id: 24, name: "Chácara Santa Aurora", type: "residencia" },
+        { id: 25, name: "Centro de Congelamento BRF", type: "industria" },
+        { id: 26, name: "Residência Industrial Vila BRF", type: "residencia" },
+        { id: 27, name: "Parque Frigorífico Nacional", type: "industria" },
+        { id: 28, name: "Multa", type: "especial" },
+        { id: 29, name: "Granja da Dona Lúcia", type: "residencia" },
+        { id: 30, name: "Vá para a Prisão", type: "corner" },
+
+        { id: 31, name: "Sorte", type: "especial" } // left column
+      ];
+
+      // Map cell to grid position for board building
+      const gridCells = [];
+      for (let r = 1; r <= 11; r++) {
+        for (let c = 1; c <= 11; c++) {
+          gridCells.push({ row: r, col: c });
+        }
+      }
+
+      const board = document.getElementById('board');
+      const diceRollBtn = document.getElementById('dice-roll-btn');
+      const diceResultSpan = document.getElementById('dice-result');
+      const playerInfoEl = document.getElementById('player-info');
+      const modal = document.getElementById('modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalDesc = document.getElementById('modal-desc');
+      const buyBtn = document.getElementById('buy-btn');
+      const passBtn = document.getElementById('pass-btn');
+      
+      const hostBtn = document.getElementById('host-btn');
+      const joinBtn = document.getElementById('join-btn');
+      const qrSection = document.getElementById('qr-section');
+      const qrLabel = document.getElementById('qr-label');
+      const qrCodeEl = document.getElementById('qr-code');
+      const videoEl = document.getElementById('camera-video');
+      const stopScanBtn = document.getElementById('stop-scan-btn');
+      const scanResult = document.getElementById('scan-result');
+      const connectStatus = document.getElementById('connect-status');
+      
+      // Players: up to 4
+      const maxPlayers = 4;
+      const players = [];
+      let playerId = null;
+      let isHost = false;
+      let currentPlayerIndex = 0;
+      let diceRolling = false;
+      let diceResult = 0;
+      
+      // WebRTC variables
+      let pc = null;
+      let dc = null;
+      let connected = false;
+      
+      // QR code variables
+      let qrGenerator = null;
+      let videoStream = null;
+      let scanActive = false;
+      let animationReqId = null;
+      let canvasEl, canvasCtx;
+
+      // Create the board cells according to your layout
+      function createBoard() {
+        board.innerHTML = '';
+        // Initialize 11x11 grid, fill edges according to boardSpaces and empty center
+        for (let r = 1; r <= 11; r++) {
+          for (let c = 1; c <= 11; c++) {
+            const div = document.createElement('div');
+            div.classList.add('cell');
+            div.style.gridRow = r;
+            div.style.gridColumn = c;
+            
+            // Determine if on perimeter (where board spaces exist)
+            const perimeter = r === 1 || r === 11 || c === 1 || c === 11;
+            if (!perimeter) {
+              div.style.background = '#1a1a1a';
+              div.style.border = 'none';
+              div.style.pointerEvents = 'none';
+              div.style.userSelect = 'none';
+              board.appendChild(div);
+              continue;
+            }
+
+            // Assign boardSpaces to correct positions:
+            // Top row left to right from index 0-10 (row=1 col=1..11)
+            if (r === 1 && c >= 1 && c <= 11) {
+              let idx = c - 1; // 0 to 10
+              const sp = boardSpaces.find(b => b.id === idx);
+              if (sp) applySpaceToCell(div, sp);
+              board.appendChild(div);
+              continue;
+            }
+
+            // Right column top to bottom excluding corners (col=11 row=2..10)
+            if (c === 11 && r >= 2 && r <= 10) {
+              let idx = 10 + (r - 1); // 11 to 19
+              const sp = boardSpaces.find(b => b.id === idx);
+              if (sp) applySpaceToCell(div, sp);
+              board.appendChild(div);
+              continue;
+            }
+
+            // Bottom row right to left (row=11 col=11..1)
+            if (r === 11 && c >= 1 && c <= 11) {
+              let idx = 20 + (11 - c); // 20 to 30
+              const sp = boardSpaces.find(b => b.id === idx);
+              if (sp) applySpaceToCell(div, sp);
+              board.appendChild(div);
+              continue;
+            }
+
+            // Left column bottom to top excl corners (col=1 row=10..2)
+            if (c === 1 && r >= 2 && r <= 10) {
+              let idx = 31 + (10 - r); // 31 to 39
+              const sp = boardSpaces.find(b => b.id === idx);
+              if (sp) applySpaceToCell(div, sp);
+              board.appendChild(div);
+              continue;
+            }
+
+            // Empty center
+            board.appendChild(div);
+          }
+        }
+        drawPlayerTokens();
+      }
+
+      // Apply space class and name text to cell
+      function applySpaceToCell(cell, space) {
+        cell.textContent = space.name;
+        cell.classList.remove('corner','residencia','industria','especial');
+        switch(space.type) {
+          case 'corner': cell.classList.add('corner'); break;
+          case 'residencia': cell.classList.add('residencia'); break;
+          case 'industria': cell.classList.add('industria'); break;
+          case 'especial': cell.classList.add('especial'); break;
+          default: break;
+        }
+        cell.dataset.spaceId = space.id;
+      }
+
+      // Draw tokens on the board
+      function drawPlayerTokens() {
+        // Remove old tokens
+        const oldTokens = board.querySelectorAll('.token');
+        oldTokens.forEach(t => t.remove());
+        // Place tokens
+        players.forEach((p,i) => {
+          const spaceId = p.position || 0;
+          const cell = [...board.children].find(c => +c.dataset.spaceId === spaceId);
+          if (!cell) return;
+          const token = document.createElement('div');
+          token.classList.add('token', `p${p.id}`);
+          // Position token inside cell, offset for multiple players on same cell
+          const offsetX = (i % 2) * 20 + 5;
+          const offsetY = Math.floor(i/2) * 20 + 5;
+          token.style.position = 'absolute';
+          const boardRect = board.getBoundingClientRect();
+          const cellRect = cell.getBoundingClientRect();
+          token.style.left = (cell.offsetLeft + offsetX) + 'px';
+          token.style.top = (cell.offsetTop + offsetY) + 'px';
+          board.appendChild(token);
+        });
+      }
+
+      // Update player info display
+      function updatePlayerInfo() {
+        playerInfoEl.innerHTML = '';
+        players.forEach((p,i) => {
+          const card = document.createElement('div');
+          card.classList.add('player-card');
+          if(i === currentPlayerIndex) card.classList.add('player-current');
+          const nameEl = document.createElement('div');
+          nameEl.classList.add('player-name');
+          nameEl.textContent = p.name;
+          card.appendChild(nameEl);
+          const balEl = document.createElement('div');
+          balEl.classList.add('player-balance');
+          balEl.textContent = `Saldo: R$${p.balance}`;
+          card.appendChild(balEl);
+          const propEl = document.createElement('div');
+          propEl.classList.add('property-list');
+          p.properties.forEach(pid => {
+            const sp = boardSpaces.find(b => b.id === pid);
+            if (!sp) return;
+            const span = document.createElement('span');
+            span.textContent = sp.name.length > 15 ? sp.name.substring(0,15) + "…" : sp.name;
+            propEl.appendChild(span);
+          });
+          card.appendChild(propEl);
+          playerInfoEl.appendChild(card);
+        });
+      }
+
+      //
+      // WebRTC + QR code connection & signaling
+      //
+      function setupScanCanvas() {
+        if(!canvasEl) {
+          canvasEl = document.createElement('canvas');
+          canvasCtx = canvasEl.getContext('2d');
+        }
+      }
+
+      function scanFrame() {
+        if(!scanActive) return;
+        if(videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
+          canvasEl.width = videoEl.videoWidth;
+          canvasEl.height = videoEl.videoHeight;
+          canvasCtx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+          const imageData = canvasCtx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {inversionAttempts: "dontInvert"});
+          if(code) {
+            stopScanning();
+            scanResult.textContent = `QR code detectado. Processando...`;
+            processScannedData(code.data);
+            return;
+          }
+        }
+        animationReqId = requestAnimationFrame(scanFrame);
+      }
+
+      function startScanning() {
+        if(scanActive) return;
+        scanActive = true;
+        scanResult.textContent = "";
+        qrLabel.textContent = "Escaneie o QR Code";
+        qrCodeEl.innerHTML = "";
+        videoEl.style.display = "block";
+        stopScanBtn.style.display = "inline-block";
+        navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
+        .then(stream => {
+          videoStream = stream;
+          videoEl.srcObject = stream;
+          videoEl.play();
+          setupScanCanvas();
+          animationReqId = requestAnimationFrame(scanFrame);
+        }).catch(err => {
+          scanResult.textContent = "Câmera indisponível ou permissão negada.";
+          stopScanBtn.style.display = "none";
+          videoEl.style.display = "none";
+          console.error(err);
+        });
+      }
+
+      function stopScanning() {
+        scanActive = false;
+        cancelAnimationFrame(animationReqId);
+        animationReqId = null;
+        if(videoStream) {
+          videoStream.getTracks().forEach(t => t.stop());
+          videoStream = null;
+        }
+        videoEl.srcObject = null;
+        videoEl.style.display = "none";
+        stopScanBtn.style.display = "none";
+      }
+      stopScanBtn.addEventListener('click', () => {
+        stopScanning();
+        scanResult.textContent = "Escaneamento cancelado.";
+        qrLabel.textContent = "";
+        qrCodeEl.innerHTML = "";
+      });
+
+      async function processScannedData(data) {
+        connectStatus.textContent = "Processando QR...";
+        try {
+          const obj = JSON.parse(data);
+          if(isHost) {
+            if(obj.type === "answer" && pc) {
+              await pc.setRemoteDescription(new RTCSessionDescription(obj));
+              connectStatus.textContent = "Conexão estabelecida (host).";
+            } else {
+              connectStatus.textContent = "Resposta SDP inválida.";
+            }
+          } else {
+            if(obj.type === "offer" && pc) {
+              await pc.setRemoteDescription(new RTCSessionDescription(obj));
+              const answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+              connectStatus.textContent = "Resposta criada. Mostre este QR para o host.";
+              showQRCode(JSON.stringify(pc.localDescription));
+            } else {
+              connectStatus.textContent = "Oferta SDP inválida.";
+            }
+          }
+        } catch (err) {
+          connectStatus.textContent = "Erro ao processar QR.";
+          console.error(err);
+        }
+      }
+
+      function showQRCode(text) {
+        qrCodeEl.innerHTML = "";
+        qrLabel.textContent = isHost ? "Compartilhe este QR code com o jogador que entrou" : "Mostre este QR code para o host";
+        qrGenerator = new QRCode(qrCodeEl, {
+          text,
+          width: 260,
+          height: 260,
+          colorDark : "#000000",
+          colorLight : "#ffffff",
+        });
+        videoEl.style.display = "none";
+        stopScanBtn.style.display = "none";
+      }
+
+      async function setupHost() {
+        isHost = true;
+        playerId = 1;
+        players.length = 0;
+        players.push({id: 1, name: "Jogador 1", colorClass: "p1", balance: 1500, position: 0, properties: [], inJail: false, jailTurns: 0});
+        gameState.players = [...players];
+        gameState.boardSpaces = boardSpaces.map(b => ({id: b.id, owner: undefined}));
+        gameState.currentPlayerIndex = 0;
+        currentPlayerIndex = 0;
+        updatePlayerInfo();
+        drawPlayerTokens();
+        diceRollBtn.disabled = true;
+        connectStatus.textContent = "Iniciando conexão como host...";
+        qrSection.style.display = "block";
+
+        pc = new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+        pc.onicecandidate = (event) => {
+          if(!event.candidate) {
+            showQRCode(JSON.stringify(pc.localDescription));
+            connectStatus.textContent = "Escaneie este QR code no dispositivo do jogador.";
+          }
+        };
+        dc = pc.createDataChannel("game");
+        setupDataChannel(dc);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+      }
+
+      async function setupJoiner() {
+        isHost = false;
+        playerId = null;
+        players.length = 0;
+        connectStatus.textContent = "Escaneie o QR code do host agora.";
+        qrSection.style.display = "block";
+        showQRCode("");
+        startScanning();
+
+        pc = new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+        pc.ondatachannel = (event) => {
+          dc = event.channel;
+          setupDataChannel(dc);
+        };
+        pc.onicecandidate = (event) => {
+          if(!event.candidate) {
+            stopScanning();
+            showQRCode(JSON.stringify(pc.localDescription));
+            connectStatus.textContent = "Mostre este QR code para o host.";
+          }
+        };
+      }
+
+      function setupDataChannel(channel) {
+        channel.onopen = () => {
+          connected = true;
+          connectStatus.textContent = "Conectado!";
+          updateDiceButton();
+        };
+        channel.onclose = () => {
+          connected = false;
+          connectStatus.textContent = "Desconectado";
+          diceRollBtn.disabled = true;
+        };
+        channel.onerror = e => {
+          console.error('Erro no canal de dados:', e);
+          connectStatus.textContent = "Erro na conexão.";
+        };
+        channel.onmessage = evt => {
+          try {
+            const msg = JSON.parse(evt.data);
+            handleMessage(msg);
+          } catch (e) {
+            console.error("Mensagem inválida:", e);
+          }
+        };
+      }
+
+      function handleMessage(msg) {
+        if(msg.type === "state") {
+          applyGameState(msg.gameState);
+        } else if(msg.type === "assignId") {
+          playerId = msg.playerId;
+          connectStatus.textContent = `Seu ID: ${playerId}`;
+          updateDiceButton();
+        } else if(msg.type === "requestId" && isHost) {
+          if(players.length < maxPlayers) {
+            const newId = players.length + 1;
+            players.push({id:newId, name:`Jogador ${newId}`, colorClass:`p${newId}`, balance:1500, position:0, properties:[], inJail:false, jailTurns:0});
+            gameState.players = [...players];
+            sendMessage({type:"assignId", playerId:newId});
+            broadcastGameState();
+          } else {
+            sendMessage({type:"error", message:"Jogo cheio"});
+          }
+        }
+      }
+
+      function sendMessage(msg) {
+        if(dc && dc.readyState === "open") {
+          dc.send(JSON.stringify(msg));
+        }
+      }
+
+      function broadcastGameState() {
+        if(!isHost || !dc || dc.readyState !== "open") return;
+        sendMessage({type:"state", gameState});
+      }
+
+      let gameState = {
+        players: [],
+        boardSpaces: boardSpaces.map(bs => ({id: bs.id, owner: undefined})),
+        currentPlayerIndex: 0,
+      };
+
+      function applyGameState(newState) {
+        gameState = newState;
+        players.length = 0;
+        gameState.players.forEach(p => players.push(p));
+        currentPlayerIndex = gameState.currentPlayerIndex;
+        updatePlayerInfo();
+        drawPlayerTokens();
+        updateDiceButton();
+      }
+
+      function updateDiceButton() {
+        if(!connected || playerId === null || gameState.players.length === 0) {
+          diceRollBtn.disabled = true;
+          return;
+        }
+        diceRollBtn.disabled = (gameState.players[gameState.currentPlayerIndex].id !== playerId);
+      }
+
+      hostBtn.addEventListener('click', () => {
+        qrSection.style.display = "block";
+        connectStatus.textContent = "";
+        if(pc) {
+          pc.close();
+          pc = null;
+        }
+        setupHost();
+      });
+
+      joinBtn.addEventListener('click', () => {
+        qrSection.style.display = "block";
+        connectStatus.textContent = "";
+        if(pc) {
+          pc.close();
+          pc = null;
+        }
+        setupJoiner();
+      });
+
+      diceRollBtn.addEventListener('click', () => {
+        if(diceRollBtn.disabled) return;
+        alert("Funcionalidade de dados e lógica do jogo ainda não implementada.");
+        diceRollBtn.disabled = true;
+      });
+
+      buyBtn.addEventListener('click', () => modal.style.display = "none");
+      passBtn.addEventListener('click', () => modal.style.display = "none");
+
+      window.addEventListener('resize', () => {
+        drawPlayerTokens();
+      });
+
+      // Initialize board and info on page load
+      createBoard();
+      updatePlayerInfo();
+      drawPlayerTokens();
+      diceRollBtn.disabled = true;
+    })();
+  </script>
+</body>
+</html>
+
+
