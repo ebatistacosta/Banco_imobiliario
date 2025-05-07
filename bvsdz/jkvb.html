@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco Imobiliário - Indústria BRF & Aurora</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="board">
+      <!-- Tabuleiro conforme seu HTML original, resumido aqui -->
+      <div class="cell corner">Início</div>
+      <div class="cell residencia">Chácara Leiteira do Zé</div>
+      <div class="cell residencia">Granja Esperança</div>
+      <div class="cell especial">Mercado e Clima</div>
+      <div class="cell residencia">Horta Orgânica VerdeVida</div>
+      <div class="cell industria">CooperFrango Ltda.</div>
+      <div class="cell especial">Imposto</div>
+      <div class="cell industria">Laticínios Boa Aurora</div>
+      <div class="cell especial">Clima</div>
+      <div class="cell residencia">Sítio Vale do Frango</div>
+      <div class="cell corner">Prisão</div>
+      <div class="cell residencia" style="grid-row: 2 / span 9; grid-column: 11;">Sítio Por do Sol</div>
+      <div class="cell corner" style="grid-row: 11; grid-column: 11;">Estacionamento</div>
+      <div class="cell industria">Fábrica de Embutidos Premium</div>
+      <div class="cell industria">Unidade Aurora Norte</div>
+      <div class="cell especial">Sorte ou Reves</div>
+      <div class="cell residencia">Chácara Santa Aurora</div>
+      <div class="cell industria">Centro de Congelamento BRF</div>
+      <div class="cell residencia">Residência Industrial Vila BRF</div>
+      <div class="cell industria">Parque Frigorífico Nacional</div>
+      <div class="cell especial">Multa</div>
+      <div class="cell residencia">Granja da Dona Lúcia</div>
+      <div class="cell corner">Vá para a Prisão</div>
+      <div class="cell especial" style="grid-row: 2 / span 9; grid-column: 1;">Sorte</div>
+    </div>
+
+    <div class="qr-section">
+      <h2>Entre no jogo escaneando o QR Code:</h2>
+      <div id="qr-codes"></div>
+    </div>
+
+    <div class="dice-section">
+      <h2>Dado:</h2>
+      <button id="roll-dice">Rolar Dado</button>
+      <div id="dice-result">🎲</div>
+    </div>
+  </div>
+</body>
+</html>

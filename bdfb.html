@@ -1,836 +1,1094 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+  
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Banco Imobiliário - Indústria BRF & Aurora Multiplayer QR</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-pO1UqBQTpKtQiU6Mv4UYq4N1UQvj3q/6REnr5jzOpovYYHicSWiMdT4xw3ckfK14Pjp5lQiG5eZGGsnLs+a6cw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: #1a1a1a;
-      color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-      user-select: none;
-    }
-    header {
-      width: 100%;
-      padding: 10px 0;
-      background: #222;
-      text-align: center;
-      font-weight: 700;
-      font-size: 1.4rem;
-      letter-spacing: 1.5px;
-      border-bottom: 3px solid #008740;
-    }
-    .board {
-      display: grid;
-      grid-template-columns: repeat(11, 1fr);
-      grid-template-rows: repeat(11, 1fr);
-      width: 95vmin;
-      height: 95vmin;
-      max-width: 900px;
-      max-height: 900px;
-      background: #fefefe;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #008740cc;
-      user-select: none;
-      position: relative;
-    }
-    .cell {
-      border: 1px solid #777;
-      background: #ffffffdd;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: calc(0.9rem + 0.5vw);
-      text-align: center;
-      position: relative;
-      padding: 4px;
-      line-height: 1.2;
-      white-space: normal;
-      color: #222;
-    }
-    .corner {
-      background: #008740;
-      color: #fff;
-      font-weight: 800;
-      font-size: calc(1.1rem + 0.5vw);
-    }
-    .residencia {
-      background: #6abd45;
-      color: #fff;
-      font-weight: 600;
-    }
-    .industria {
-      background: #f39c12;
-      color: #fff;
-      font-weight: 600;
-    }
-    .especial {
-      background: #e74c3c;
-      color: #fff;
-      font-weight: 700;
-    }
-    #controls {
-      width: 95vmin;
-      max-width: 900px;
-      max-height: 250px;
-      background: #222;
-      color: #eee;
-      padding: 10px 16px;
-      margin-top: 10px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px #008740cc inset;
-      display: flex;
-      flex-direction: column;
-      font-size: 1rem;
-    }
-    #connect-panel {
-      margin-bottom: 12px;
-    }
-    #connect-btns {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      margin: 8px 0;
-    }
-    #connect-btns button {
-      cursor: pointer;
-      flex-grow: 1;
-      padding: 12px 0;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: #eee;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #008740cc;
-      transition: background 0.3s ease;
-      user-select: none;
-      background: #008740;
-    }
-    #connect-btns button.join-btn {
-      background: #004d00;
-    }
-    #qr-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-top: 6px;
-    }
-    #qr-section > div {
-      margin: 6px 0;
-      background: white;
-      border-radius: 12px;
-      padding: 12px;
-    }
-    #qr-code {
-      width: 260px;
-      height: 260px;
-      user-select: none;
-    }
-    #camera-video {
-      display: none;
-      width: 260px;
-      height: 260px;
-      border-radius: 12px;
-      border: 1px solid #444;
-      background: black;
-      user-select: none;
-    }
-    #scan-result {
-      max-width: 260px;
-      word-break: break-word;
-      color: #0f0;
-      font-weight: 700;
-      margin-top: 12px;
-      user-select: text;
-    }
-    #stop-scan-btn {
-      margin-top: 8px;
-      background: #aa2222;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      padding: 10px 18px;
-      cursor: pointer;
-      user-select: none;
-      display: none;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    #dice-roll-btn {
-      background: #008740;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      padding: 14px;
-      font-weight: 700;
-      font-size: 1.3rem;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 0 12px #009e50;
-      transition: background 0.3s ease;
-      margin-top: 4px;
-    }
-    #dice-roll-btn:disabled {
-      background: #555;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-    #dice-result {
-      font-weight: 700;
-      font-size: 1.6rem;
-      color: #00ff44;
-      margin-top: 6px;
-      text-align: center;
-      user-select: none;
-    }
-    #player-info {
-      margin-top: 12px;
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-    .player-card {
-      background: #111;
-      margin-bottom: 10px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #008740cc inset;
-      position: relative;
-    }
-    .player-name {
-      font-weight: 700;
-      margin-bottom: 6px;
-      font-size: 1.1rem;
-    }
-    .player-balance {
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 1rem;
-    }
-    .property-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .property-list span {
-      font-size: 0.9rem;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: #006622bb;
-      user-select: text;
-    }
-    .player-current {
-      outline: 3px solid #00ff00;
-      box-shadow: 0 0 12px #00ff00;
-    }
-    .token {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      border: 2px solid #222;
-      box-shadow: 0 0 6px #000a inset;
-      transition: all 0.3s ease;
-      z-index: 10;
-    }
-    .p1 {
-      background: #f44336;
-    }
-    .p2 {
-      background: #2196f3;
-    }
-    .p3 {
-      background: #ffeb3b;
-    }
-    .p4 {
-      background: #4caf50;
-    }
-    @media (max-width: 600px) {
-      .board {
-        width: 95vw;
-        height: 95vw;
-      }
-      #qr-code, #camera-video {
-        width: 90vw;
-        height: 90vw;
-      }
-      #player-info {
-        font-size: 0.9rem;
-      }
-      .cell {
-        font-size: 0.8rem;
-        padding: 2px;
-      }
-      #dice-roll-btn {
-        font-size: 1.1rem;
-        padding: 10px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>Banco Imobiliário - Indústria BRF & Aurora Multiplayer QR</header>
-
-  <div class="board" id="board" aria-label="Banco Imobiliário board"></div>
-
-  <div id="controls">
-    <div id="connect-panel" aria-live="polite">
-      <div><strong>Conectar via QR Code</strong></div>
-      <div id="connect-btns">
-        <button id="host-btn" aria-label="Hospedar jogo">Hospedar</button>
-        <button id="join-btn" aria-label="Entrar no jogo">Entrar</button>
-      </div>
-      <div id="qr-section" style="display:none;">
-        <div id="qr-label"></div>
-        <div id="qr-code"></div>
-        <video id="camera-video" autoplay muted playsinline></video>
-        <button id="stop-scan-btn">Parar de escanear</button>
-        <div id="scan-result" aria-live="polite" aria-atomic="true"></div>
-      </div>
-      <div id="connect-status"></div>
-    </div>
-
-    <button id="dice-roll-btn" aria-live="polite" aria-label="Lançar Dados" disabled>Lançar Dados</button>
-    <div id="dice-result" aria-live="polite" aria-atomic="true"></div>
-
-    <div id="player-info" tabindex="0" aria-label="Informações dos jogadores"></div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Imobiliário Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <div id="qr-codes" class="flex justify-center space-x-4 mb-8">
+      <!-- QR Codes serão gerados dinamicamente aqui -->
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+    const gameId = "xyz"; // ID único da partida
+    const serverUrl = "wss://meujogo.com/ws"; // URL do servidor WebSocket
+    const qrCodesContainer = document.getElementById("qr-codes");
 
-  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
-    <div id="modal-content">
-      <h2 id="modal-title"></h2>
-      <p id="modal-desc"></p>
-      <div id="modal-buttons">
-        <button id="buy-btn" class="modal-btn buy">Comprar</button>
-        <button id="pass-btn" class="modal-btn pass">Passar</button>
-      </div>
-    </div>
-  </div>
+    // Inicializar WebSocket
+    const socket = new WebSocket(serverUrl);
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-  <script>
-    (() => {
-      "use strict";
-      // Board layout cells data (matching your named cells in the HTML you provided)
-      // We map them in order for 11x11 grid distribution on edges, filling the inner cells empty
-      const boardSpaces = [
-        { id: 0, name: "Início", type: "corner" },
-        { id: 1, name: "Chácara Leiteira do Zé", type: "residencia" },
-        { id: 2, name: "Granja Esperança", type: "residencia" },
-        { id: 3, name: "Mercado e Clima", type: "especial" },
-        { id: 4, name: "Horta Orgânica VerdeVida", type: "residencia" },
-        { id: 5, name: "CooperFrango Ltda.", type: "industria" },
-        { id: 6, name: "Imposto", type: "especial" },
-        { id: 7, name: "Laticínios Boa Aurora", type: "industria" },
-        { id: 8, name: "Clima", type: "especial" },
-        { id: 9, name: "Sítio Vale do Frango", type: "residencia" },
-        { id: 10, name: "Prisão", type: "corner" },
+    socket.onopen = () => {
+        console.log("Conectado ao servidor WebSocket.");
+    };
 
-        { id: 11, name: "Sítio Por do Sol", type: "residencia" }, // right column
-
-        { id: 20, name: "Estacionamento", type: "corner" },
-        { id: 21, name: "Fábrica de Embutidos Premium", type: "industria" },
-        { id: 22, name: "Unidade Aurora Norte", type: "industria" },
-        { id: 23, name: "Sorte ou Reves", type: "especial" },
-        { id: 24, name: "Chácara Santa Aurora", type: "residencia" },
-        { id: 25, name: "Centro de Congelamento BRF", type: "industria" },
-        { id: 26, name: "Residência Industrial Vila BRF", type: "residencia" },
-        { id: 27, name: "Parque Frigorífico Nacional", type: "industria" },
-        { id: 28, name: "Multa", type: "especial" },
-        { id: 29, name: "Granja da Dona Lúcia", type: "residencia" },
-        { id: 30, name: "Vá para a Prisão", type: "corner" },
-
-        { id: 31, name: "Sorte", type: "especial" } // left column
-      ];
-
-      // Map cell to grid position for board building
-      const gridCells = [];
-      for (let r = 1; r <= 11; r++) {
-        for (let c = 1; c <= 11; c++) {
-          gridCells.push({ row: r, col: c });
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "update") {
+            // Atualizar informações do jogador
+            updatePlayerInfoFromServer(data.payload);
         }
-      }
+    };
 
-      const board = document.getElementById('board');
-      const diceRollBtn = document.getElementById('dice-roll-btn');
-      const diceResultSpan = document.getElementById('dice-result');
-      const playerInfoEl = document.getElementById('player-info');
-      const modal = document.getElementById('modal');
-      const modalTitle = document.getElementById('modal-title');
-      const modalDesc = document.getElementById('modal-desc');
-      const buyBtn = document.getElementById('buy-btn');
-      const passBtn = document.getElementById('pass-btn');
-      
-      const hostBtn = document.getElementById('host-btn');
-      const joinBtn = document.getElementById('join-btn');
-      const qrSection = document.getElementById('qr-section');
-      const qrLabel = document.getElementById('qr-label');
-      const qrCodeEl = document.getElementById('qr-code');
-      const videoEl = document.getElementById('camera-video');
-      const stopScanBtn = document.getElementById('stop-scan-btn');
-      const scanResult = document.getElementById('scan-result');
-      const connectStatus = document.getElementById('connect-status');
-      
-      // Players: up to 4
-      const maxPlayers = 4;
-      const players = [];
-      let playerId = null;
-      let isHost = false;
-      let currentPlayerIndex = 0;
-      let diceRolling = false;
-      let diceResult = 0;
-      
-      // WebRTC variables
-      let pc = null;
-      let dc = null;
-      let connected = false;
-      
-      // QR code variables
-      let qrGenerator = null;
-      let videoStream = null;
-      let scanActive = false;
-      let animationReqId = null;
-      let canvasEl, canvasCtx;
+    socket.onerror = (error) => {
+        console.error("Erro no WebSocket:", error);
 
-      // Create the board cells according to your layout
-      function createBoard() {
-        board.innerHTML = '';
-        // Initialize 11x11 grid, fill edges according to boardSpaces and empty center
-        for (let r = 1; r <= 11; r++) {
-          for (let c = 1; c <= 11; c++) {
-            const div = document.createElement('div');
-            div.classList.add('cell');
-            div.style.gridRow = r;
-            div.style.gridColumn = c;
-            
-            // Determine if on perimeter (where board spaces exist)
-            const perimeter = r === 1 || r === 11 || c === 1 || c === 11;
-            if (!perimeter) {
-              div.style.background = '#1a1a1a';
-              div.style.border = 'none';
-              div.style.pointerEvents = 'none';
-              div.style.userSelect = 'none';
-              board.appendChild(div);
-              continue;
-            }
+    };
 
-            // Assign boardSpaces to correct positions:
-            // Top row left to right from index 0-10 (row=1 col=1..11)
-            if (r === 1 && c >= 1 && c <= 11) {
-              let idx = c - 1; // 0 to 10
-              const sp = boardSpaces.find(b => b.id === idx);
-              if (sp) applySpaceToCell(div, sp);
-              board.appendChild(div);
-              continue;
-            }
+    // Gerar QR Codes para cada jogador
+    function generateQRCodes() {
+        gameState.players.forEach(player => {
+            const qrCodeDiv = document.createElement("div");
+            qrCodeDiv.className = "text-center";
 
-            // Right column top to bottom excluding corners (col=11 row=2..10)
-            if (c === 11 && r >= 2 && r <= 10) {
-              let idx = 10 + (r - 1); // 11 to 19
-              const sp = boardSpaces.find(b => b.id === idx);
-              if (sp) applySpaceToCell(div, sp);
-              board.appendChild(div);
-              continue;
-            }
+            const qrCodeCanvas = document.createElement("canvas");
+            qrCodeDiv.appendChild(qrCodeCanvas);
 
-            // Bottom row right to left (row=11 col=11..1)
-            if (r === 11 && c >= 1 && c <= 11) {
-              let idx = 20 + (11 - c); // 20 to 30
-              const sp = boardSpaces.find(b => b.id === idx);
-              if (sp) applySpaceToCell(div, sp);
-              board.appendChild(div);
-              continue;
-            }
+            const playerLink = `https://meujogo.com/partida/${gameId}/jogador${player.id}`;
+            QRCode.toCanvas(qrCodeCanvas, playerLink, { width: 128 }, (error) => {
+                if (error) console.error("Erro ao gerar QR Code:", error);
+            });
 
-            // Left column bottom to top excl corners (col=1 row=10..2)
-            if (c === 1 && r >= 2 && r <= 10) {
-              let idx = 31 + (10 - r); // 31 to 39
-              const sp = boardSpaces.find(b => b.id === idx);
-              if (sp) applySpaceToCell(div, sp);
-              board.appendChild(div);
-              continue;
-            }
+            const playerLabel = document.createElement("p");
+            playerLabel.textContent = player.name;
+            playerLabel.className = "text-sm font-bold mt-2";
+            qrCodeDiv.appendChild(playerLabel);
 
-            // Empty center
-            board.appendChild(div);
-          }
-        }
-        drawPlayerTokens();
-      }
-
-      // Apply space class and name text to cell
-      function applySpaceToCell(cell, space) {
-        cell.textContent = space.name;
-        cell.classList.remove('corner','residencia','industria','especial');
-        switch(space.type) {
-          case 'corner': cell.classList.add('corner'); break;
-          case 'residencia': cell.classList.add('residencia'); break;
-          case 'industria': cell.classList.add('industria'); break;
-          case 'especial': cell.classList.add('especial'); break;
-          default: break;
-        }
-        cell.dataset.spaceId = space.id;
-      }
-
-      // Draw tokens on the board
-      function drawPlayerTokens() {
-        // Remove old tokens
-        const oldTokens = board.querySelectorAll('.token');
-        oldTokens.forEach(t => t.remove());
-        // Place tokens
-        players.forEach((p,i) => {
-          const spaceId = p.position || 0;
-          const cell = [...board.children].find(c => +c.dataset.spaceId === spaceId);
-          if (!cell) return;
-          const token = document.createElement('div');
-          token.classList.add('token', `p${p.id}`);
-          // Position token inside cell, offset for multiple players on same cell
-          const offsetX = (i % 2) * 20 + 5;
-          const offsetY = Math.floor(i/2) * 20 + 5;
-          token.style.position = 'absolute';
-          const boardRect = board.getBoundingClientRect();
-          const cellRect = cell.getBoundingClientRect();
-          token.style.left = (cell.offsetLeft + offsetX) + 'px';
-          token.style.top = (cell.offsetTop + offsetY) + 'px';
-          board.appendChild(token);
+            qrCodesContainer.appendChild(qrCodeDiv);
         });
-      }
-
-      // Update player info display
-      function updatePlayerInfo() {
-        playerInfoEl.innerHTML = '';
-        players.forEach((p,i) => {
-          const card = document.createElement('div');
-          card.classList.add('player-card');
-          if(i === currentPlayerIndex) card.classList.add('player-current');
-          const nameEl = document.createElement('div');
-          nameEl.classList.add('player-name');
-          nameEl.textContent = p.name;
-          card.appendChild(nameEl);
-          const balEl = document.createElement('div');
-          balEl.classList.add('player-balance');
-          balEl.textContent = `Saldo: R$${p.balance}`;
-          card.appendChild(balEl);
-          const propEl = document.createElement('div');
-          propEl.classList.add('property-list');
-          p.properties.forEach(pid => {
-            const sp = boardSpaces.find(b => b.id === pid);
-            if (!sp) return;
-            const span = document.createElement('span');
-            span.textContent = sp.name.length > 15 ? sp.name.substring(0,15) + "…" : sp.name;
-            propEl.appendChild(span);
-          });
-          card.appendChild(propEl);
-          playerInfoEl.appendChild(card);
-        });
-      }
-
-      //
-      // WebRTC + QR code connection & signaling
-      //
-      function setupScanCanvas() {
-        if(!canvasEl) {
-          canvasEl = document.createElement('canvas');
-          canvasCtx = canvasEl.getContext('2d');
-        }
-      }
-
-      function scanFrame() {
-        if(!scanActive) return;
-        if(videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
-          canvasEl.width = videoEl.videoWidth;
-          canvasEl.height = videoEl.videoHeight;
-          canvasCtx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-          const imageData = canvasCtx.getImageData(0, 0, canvasEl.width, canvasEl.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {inversionAttempts: "dontInvert"});
-          if(code) {
-            stopScanning();
-            scanResult.textContent = `QR code detectado. Processando...`;
-            processScannedData(code.data);
-            return;
-          }
-        }
-        animationReqId = requestAnimationFrame(scanFrame);
-      }
-
-      function startScanning() {
-        if(scanActive) return;
-        scanActive = true;
-        scanResult.textContent = "";
-        qrLabel.textContent = "Escaneie o QR Code";
-        qrCodeEl.innerHTML = "";
-        videoEl.style.display = "block";
-        stopScanBtn.style.display = "inline-block";
-        navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-        .then(stream => {
-          videoStream = stream;
-          videoEl.srcObject = stream;
-          videoEl.play();
-          setupScanCanvas();
-          animationReqId = requestAnimationFrame(scanFrame);
-        }).catch(err => {
-          scanResult.textContent = "Câmera indisponível ou permissão negada.";
-          stopScanBtn.style.display = "none";
-          videoEl.style.display = "none";
-          console.error(err);
-        });
-      }
-
-      function stopScanning() {
-        scanActive = false;
-        cancelAnimationFrame(animationReqId);
-        animationReqId = null;
-        if(videoStream) {
-          videoStream.getTracks().forEach(t => t.stop());
-          videoStream = null;
-        }
-        videoEl.srcObject = null;
-        videoEl.style.display = "none";
-        stopScanBtn.style.display = "none";
-      }
-      stopScanBtn.addEventListener('click', () => {
-        stopScanning();
-        scanResult.textContent = "Escaneamento cancelado.";
-        qrLabel.textContent = "";
-        qrCodeEl.innerHTML = "";
-      });
-
-      async function processScannedData(data) {
-        connectStatus.textContent = "Processando QR...";
-        try {
-          const obj = JSON.parse(data);
-          if(isHost) {
-            if(obj.type === "answer" && pc) {
-              await pc.setRemoteDescription(new RTCSessionDescription(obj));
-              connectStatus.textContent = "Conexão estabelecida (host).";
-            } else {
-              connectStatus.textContent = "Resposta SDP inválida.";
-            }
-          } else {
-            if(obj.type === "offer" && pc) {
-              await pc.setRemoteDescription(new RTCSessionDescription(obj));
-              const answer = await pc.createAnswer();
-              await pc.setLocalDescription(answer);
-              connectStatus.textContent = "Resposta criada. Mostre este QR para o host.";
-              showQRCode(JSON.stringify(pc.localDescription));
-            } else {
-              connectStatus.textContent = "Oferta SDP inválida.";
-            }
-          }
-        } catch (err) {
-          connectStatus.textContent = "Erro ao processar QR.";
-          console.error(err);
-        }
-      }
-
-      function showQRCode(text) {
-        qrCodeEl.innerHTML = "";
-        qrLabel.textContent = isHost ? "Compartilhe este QR code com o jogador que entrou" : "Mostre este QR code para o host";
-        qrGenerator = new QRCode(qrCodeEl, {
-          text,
-          width: 260,
-          height: 260,
-          colorDark : "#000000",
-          colorLight : "#ffffff",
-        });
-        videoEl.style.display = "none";
-        stopScanBtn.style.display = "none";
-      }
-
-      async function setupHost() {
-        isHost = true;
-        playerId = 1;
-        players.length = 0;
-        players.push({id: 1, name: "Jogador 1", colorClass: "p1", balance: 1500, position: 0, properties: [], inJail: false, jailTurns: 0});
-        gameState.players = [...players];
-        gameState.boardSpaces = boardSpaces.map(b => ({id: b.id, owner: undefined}));
-        gameState.currentPlayerIndex = 0;
-        currentPlayerIndex = 0;
-        updatePlayerInfo();
-        drawPlayerTokens();
-        diceRollBtn.disabled = true;
-        connectStatus.textContent = "Iniciando conexão como host...";
-        qrSection.style.display = "block";
-
-        pc = new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
-        pc.onicecandidate = (event) => {
-          if(!event.candidate) {
-            showQRCode(JSON.stringify(pc.localDescription));
-            connectStatus.textContent = "Escaneie este QR code no dispositivo do jogador.";
-          }
-        };
-        dc = pc.createDataChannel("game");
-        setupDataChannel(dc);
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-      }
-
-      async function setupJoiner() {
-        isHost = false;
-        playerId = null;
-        players.length = 0;
-        connectStatus.textContent = "Escaneie o QR code do host agora.";
-        qrSection.style.display = "block";
-        showQRCode("");
-        startScanning();
-
-        pc = new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
-        pc.ondatachannel = (event) => {
-          dc = event.channel;
-          setupDataChannel(dc);
-        };
-        pc.onicecandidate = (event) => {
-          if(!event.candidate) {
-            stopScanning();
-            showQRCode(JSON.stringify(pc.localDescription));
-            connectStatus.textContent = "Mostre este QR code para o host.";
-          }
-        };
-      }
-
-      function setupDataChannel(channel) {
-        channel.onopen = () => {
-          connected = true;
-          connectStatus.textContent = "Conectado!";
-          updateDiceButton();
-        };
-        channel.onclose = () => {
-          connected = false;
-          connectStatus.textContent = "Desconectado";
-          diceRollBtn.disabled = true;
-        };
-        channel.onerror = e => {
-          console.error('Erro no canal de dados:', e);
-          connectStatus.textContent = "Erro na conexão.";
-        };
-        channel.onmessage = evt => {
-          try {
-            const msg = JSON.parse(evt.data);
-            handleMessage(msg);
-          } catch (e) {
-            console.error("Mensagem inválida:", e);
-          }
-        };
-      }
-
-      function handleMessage(msg) {
-        if(msg.type === "state") {
-          applyGameState(msg.gameState);
-        } else if(msg.type === "assignId") {
-          playerId = msg.playerId;
-          connectStatus.textContent = `Seu ID: ${playerId}`;
-          updateDiceButton();
-        } else if(msg.type === "requestId" && isHost) {
-          if(players.length < maxPlayers) {
-            const newId = players.length + 1;
-            players.push({id:newId, name:`Jogador ${newId}`, colorClass:`p${newId}`, balance:1500, position:0, properties:[], inJail:false, jailTurns:0});
-            gameState.players = [...players];
-            sendMessage({type:"assignId", playerId:newId});
-            broadcastGameState();
-          } else {
-            sendMessage({type:"error", message:"Jogo cheio"});
-          }
-        }
-      }
-
-      function sendMessage(msg) {
-        if(dc && dc.readyState === "open") {
-          dc.send(JSON.stringify(msg));
-        }
-      }
-
-      function broadcastGameState() {
-        if(!isHost || !dc || dc.readyState !== "open") return;
-        sendMessage({type:"state", gameState});
-      }
-
-      let gameState = {
-        players: [],
-        boardSpaces: boardSpaces.map(bs => ({id: bs.id, owner: undefined})),
+    }const gameState = {
+        players: [
+            { id: 1, name: "Jogador 1", balance: 1500, position: 0, color: "red", properties: [], inJail: false },
+            { id: 2, name: "Jogador 2", balance: 1500, position: 0, color: "blue", properties: [], inJail: false },
+            { id: 3, name: "Jogador 3", balance: 1500, position: 0, color: "green", properties: [], inJail: false },
+            { id: 4, name: "Jogador 4", balance: 1500, position: 0, color: "yellow", properties: [], inJail: false }
+        ],
         currentPlayerIndex: 0,
-      };
+        properties: [
+            // ...existing properties...
+        ],
+        diceRolled: false
+    };
 
-      function applyGameState(newState) {
-        gameState = newState;
-        players.length = 0;
-        gameState.players.forEach(p => players.push(p));
-        currentPlayerIndex = gameState.currentPlayerIndex;
-        updatePlayerInfo();
-        drawPlayerTokens();
-        updateDiceButton();
-      }
+    // Adicionar sistema de QR Code e WebSocket aqui
+    const gameId = "xyz"; // ID único da partida
+    const serverUrl = "wss://meujogo.com/ws"; // URL do servidor WebSocket
+    const qrCodesContainer = document.getElementById("qr-codes");
 
-      function updateDiceButton() {
-        if(!connected || playerId === null || gameState.players.length === 0) {
-          diceRollBtn.disabled = true;
-          return;
+    // Inicializar WebSocket
+    const socket = new WebSocket(serverUrl);
+
+    socket.onopen = () => {
+        console.log("Conectado ao servidor WebSocket.");
+    };
+
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "update") {
+            updatePlayerInfoFromServer(data.payload);
         }
-        diceRollBtn.disabled = (gameState.players[gameState.currentPlayerIndex].id !== playerId);
-      }
+    };
 
-      hostBtn.addEventListener('click', () => {
-        qrSection.style.display = "block";
-        connectStatus.textContent = "";
-        if(pc) {
-          pc.close();
-          pc = null;
+    socket.onerror = (error) => {
+        console.error("Erro no WebSocket:", error);
+    };
+
+    // Gerar QR Codes para cada jogador
+    function generateQRCodes() {
+        gameState.players.forEach(player => {
+            const qrCodeDiv = document.createElement("div");
+            qrCodeDiv.className = "text-center";
+
+            const qrCodeCanvas = document.createElement("canvas");
+            qrCodeDiv.appendChild(qrCodeCanvas);
+
+            const playerLink = `https://meujogo.com/partida/${gameId}/jogador${player.id}`;
+            QRCode.toCanvas(qrCodeCanvas, playerLink, { width: 128 }, (error) => {
+                if (error) console.error("Erro ao gerar QR Code:", error);
+            });
+
+            const playerLabel = document.createElement("p");
+            playerLabel.textContent = player.name;
+            playerLabel.className = "text-sm font-bold mt-2";
+            qrCodeDiv.appendChild(playerLabel);
+
+            qrCodesContainer.appendChild(qrCodeDiv);
+        });
+    }
+
+    // Enviar atualizações para o servidor
+    function sendUpdateToServer(type, payload) {
+        socket.send(JSON.stringify({ type, payload }));
+    }
+
+    // Atualizar informações do jogador a partir do servidor
+    function updatePlayerInfoFromServer(payload) {
+        const player = gameState.players.find(p => p.id === payload.playerId);
+        if (player) {
+            player.balance = payload.balance;
+            player.properties = payload.properties;
+            updatePlayerInfo();
         }
-        setupHost();
-      });
+    }
 
-      joinBtn.addEventListener('click', () => {
-        qrSection.style.display = "block";
-        connectStatus.textContent = "";
-        if(pc) {
-          pc.close();
-          pc = null;
+    // Chamar a função para gerar os QR Codes
+    generateQRCodes();
+
+    // Enviar atualizações para o servidor
+    function sendUpdateToServer(type, payload) {
+        socket.send(JSON.stringify({ type, payload }));
+    }
+
+    // Atualizar informações do jogador a partir do servidor
+    function updatePlayerInfoFromServer(payload) {
+        const player = gameState.players.find(p => p.id === payload.playerId);
+        if (player) {
+            player.balance = payload.balance;
+            player.properties = payload.properties;
+            updatePlayerInfo();
         }
-        setupJoiner();
-      });
+    }
 
-      diceRollBtn.addEventListener('click', () => {
-        if(diceRollBtn.disabled) return;
-        alert("Funcionalidade de dados e lógica do jogo ainda não implementada.");
-        diceRollBtn.disabled = true;
-      });
-
-      buyBtn.addEventListener('click', () => modal.style.display = "none");
-      passBtn.addEventListener('click', () => modal.style.display = "none");
-
-      window.addEventListener('resize', () => {
-        drawPlayerTokens();
-      });
-
-      // Initialize board and info on page load
-      createBoard();
-      updatePlayerInfo();
-      drawPlayerTokens();
-      diceRollBtn.disabled = true;
-    })();
-  </script>
+    // Chamar a função para gerar os QR Codes
+    generateQRCodes();
+    function buyProperty(property) {
+    const player = gameState.players[gameState.currentPlayerIndex];
+    
+    player.balance -= property.price;
+    property.owner = player.id;
+    player.properties.push(property.id);
+    
+    updatePlayerInfo();
+    addToGameLog(`${player.name} comprou ${property.name} por $${property.price}.`);
+    
+    // Enviar atualização para o servidor
+    sendUpdateToServer("propertyPurchase", {
+        playerId: player.id,
+        propertyId: property.id,
+        balance: player.balance,
+        properties: player.properties
+    });
+}
+</script>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            grid-template-rows: repeat(11, 1fr);
+            width: 800px;
+            height: 800px;
+            margin: 0 auto;
+            position: relative;
+            background-color: #f5f5dc;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .property {
+            border: 1px solid #8B4513;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .property:hover {
+            transform: scale(1.05);
+            z-index: 20;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .corner {
+            background-color: #f0e6cc;
+            font-weight: bold;
+        }
+        
+        .player-token {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+        }
+        
+        .property-group-1 { background-color: #a7d8ff; }
+        .property-group-2 { background-color: #ffb6c1; }
+        .property-group-3 { background-color: #98fb98; }
+        .property-group-4 { background-color: #ffd700; }
+        .property-group-5 { background-color: #ff6347; }
+        .property-group-6 { background-color: #9370db; }
+        .property-group-7 { background-color: #ffa500; }
+        .property-group-8 { background-color: #ff0000; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 25px;
+            border-radius: 12px;
+            width: 50%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.4s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dice-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 5;
+        }
+        
+        .dice {
+            font-size: 40px;
+            text-align: center;
+            margin: 10px 0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .property-houses {
+            position: absolute;
+            bottom: 5px;
+            display: flex;
+            gap: 2px;
+        }
+        
+        .house {
+            width: 8px;
+            height: 8px;
+            background-color: green;
+            border-radius: 2px;
+        }
+        
+        .hotel {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        
+        .dice-btn {
+            background: linear-gradient(145deg, #4a6bff, #3a56d4);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .dice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dice-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .dice-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border: 5px solid #8B4513;
+        }
+        
+        .center-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-indigo-800">Banco Imobiliário Digital</h1>
+        
+        <div class="flex justify-center mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-semibold">Jogador Atual: <span id="current-player" class="font-bold"></span></h2>
+                        <p class="text-gray-600">Saldo: $<span id="current-balance">0</span></p>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="roll-dice" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-dice mr-2"></i>Lançar Dados
+                        </button>
+                        <button id="end-turn" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105" disabled>
+                            <i class="fas fa-flag-checkered mr-2"></i>Terminar Turno
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="bg-red-100 p-4 rounded-lg border-l-4 border-red-500 shadow">
+                        <h3 class="font-semibold text-red-800">Jogador 1</h3>
+                        <p class="text-gray-700">Saldo: $<span id="balance-1" class="font-bold">1500</span></p>
+                        <div class="mt-2 h-2 bg-red-200 rounded-full">
+                            <div id="health-1" class="h-2 bg-red-500 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-lg border-l-4 border-blue-500 shadow">
+                        <h3 class="font-semibold text-blue-800">Jogador 2</h3>
+                        <p class="text-gray-700">Saldo: $<span id="balance-2" class="font-bold">1500</span></p>
+                        <div class="mt-2 h-2 bg-blue-200 rounded-full">
+                            <div id="health-2" class="h-2 bg-blue-500 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-lg border-l-4 border-green-500 shadow">
+                        <h3 class="font-semibold text-green-800">Jogador 3</h3>
+                        <p class="text-gray-700">Saldo: $<span id="balance-3" class="font-bold">1500</span></p>
+                        <div class="mt-2 h-2 bg-green-200 rounded-full">
+                            <div id="health-3" class="h-2 bg-green-500 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-100 p-4 rounded-lg border-l-4 border-yellow-500 shadow">
+                        <h3 class="font-semibold text-yellow-800">Jogador 4</h3>
+                        <p class="text-gray-700">Saldo: $<span id="balance-4" class="font-bold">1500</span></p>
+                        <div class="mt-2 h-2 bg-yellow-200 rounded-full">
+                            <div id="health-4" class="h-2 bg-yellow-500 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-inner">
+                    <h3 class="font-semibold mb-2 text-gray-700">Histórico do Jogo</h3>
+                    <div id="game-log" class="h-32 overflow-y-auto border border-gray-200 p-3 text-sm bg-gray-50 rounded"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="relative">
+            <div class="board bg-white shadow-lg">
+                <!-- Corner: Partida -->
+                <div class="property corner" style="grid-column: 1 / span 2; grid-row: 1 / span 2;">
+                    <i class="fas fa-flag text-3xl mb-1 text-green-600"></i>
+                    <span class="font-bold">PARTIDA</span>
+                    <div class="absolute bottom-2 right-2 text-xs font-bold">$200</div>
+                </div>
+                
+                <!-- Top Row -->
+                <div class="property property-group-1" style="grid-column: 3; grid-row: 1;">
+                    <span class="font-medium">Leblon</span>
+                    <div class="text-xs font-bold">$100</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-1" style="grid-column: 4; grid-row: 1;">
+                    <span class="font-medium">Av. Vieira Souto</span>
+                    <div class="text-xs font-bold">$100</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 5; grid-row: 1; background-color: #ffcccb;">
+                    <i class="fas fa-question text-2xl mb-1 text-red-600"></i>
+                    <span class="font-medium">Sorte/Reves</span>
+                </div>
+                <div class="property property-group-2" style="grid-column: 6; grid-row: 1;">
+                    <span class="font-medium">Av. N.S. Copacabana</span>
+                    <div class="text-xs font-bold">$120</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 7; grid-row: 1; background-color: #e6e6fa;">
+                    <i class="fas fa-train text-2xl mb-1 text-purple-800"></i>
+                    <span class="font-medium">Estação</span>
+                    <div class="text-xs font-bold">$200</div>
+                </div>
+                <div class="property property-group-2" style="grid-column: 8; grid-row: 1;">
+                    <span class="font-medium">Av. Presidente Vargas</span>
+                    <div class="text-xs font-bold">$140</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-2" style="grid-column: 9; grid-row: 1;">
+                    <span class="font-medium">Av. Rio Branco</span>
+                    <div class="text-xs font-bold">$160</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-3" style="grid-column: 10; grid-row: 1;">
+                    <span class="font-medium">Interlagos</span>
+                    <div class="text-xs font-bold">$180</div>
+                    <div class="property-houses"></div>
+                </div>
+                
+                <!-- Corner: Prisão -->
+                <div class="property corner" style="grid-column: 11 / span 2; grid-row: 1 / span 2;">
+                    <i class="fas fa-lock text-3xl mb-1 text-red-600"></i>
+                    <span class="font-bold">PRISÃO</span>
+                </div>
+                
+                <!-- Right Column -->
+                <div class="property property-group-3" style="grid-column: 11; grid-row: 3;">
+                    <span class="font-medium">Morumbi</span>
+                    <div class="text-xs font-bold">$180</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 11; grid-row: 4; background-color: #e6f7ff;">
+                    <i class="fas fa-lightbulb text-2xl mb-1 text-blue-600"></i>
+                    <span class="font-medium">Companhia</span>
+                    <div class="text-xs font-bold">$150</div>
+                </div>
+                <div class="property property-group-3" style="grid-column: 11; grid-row: 5;">
+                    <span class="font-medium">Flamengo</span>
+                    <div class="text-xs font-bold">$200</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-4" style="grid-column: 11; grid-row: 6;">
+                    <span class="font-medium">Botafogo</span>
+                    <div class="text-xs font-bold">$220</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 11; grid-row: 7; background-color: #e6e6fa;">
+                    <i class="fas fa-train text-2xl mb-1 text-purple-800"></i>
+                    <span class="font-medium">Estação</span>
+                    <div class="text-xs font-bold">$200</div>
+                </div>
+                <div class="property property-group-4" style="grid-column: 11; grid-row: 8;">
+                    <span class="font-medium">Av. Brasil</span>
+                    <div class="text-xs font-bold">$240</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-4" style="grid-column: 11; grid-row: 9;">
+                    <span class="font-medium">Av. Paulista</span>
+                    <div class="text-xs font-bold">$260</div>
+                    <div class="property-houses"></div>
+                </div>
+                
+                <!-- Corner: Parada Livre -->
+                <div class="property corner" style="grid-column: 11 / span 2; grid-row: 11 / span 2;">
+                    <i class="fas fa-parking text-3xl mb-1 text-green-600"></i>
+                    <span class="font-bold">PARADA LIVRE</span>
+                </div>
+                
+                <!-- Bottom Row -->
+                <div class="property property-group-5" style="grid-column: 10; grid-row: 11;">
+                    <span class="font-medium">Jardim Europa</span>
+                    <div class="text-xs font-bold">$280</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 9; grid-row: 11; background-color: #ffcccb;">
+                    <i class="fas fa-question text-2xl mb-1 text-red-600"></i>
+                    <span class="font-medium">Sorte/Reves</span>
+                </div>
+                <div class="property property-group-5" style="grid-column: 8; grid-row: 11;">
+                    <span class="font-medium">Copacabana</span>
+                    <div class="text-xs font-bold">$300</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-5" style="grid-column: 7; grid-row: 11;">
+                    <span class="font-medium">Av. Atlântica</span>
+                    <div class="text-xs font-bold">$320</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 6; grid-row: 11; background-color: #e6e6fa;">
+                    <i class="fas fa-train text-2xl mb-1 text-purple-800"></i>
+                    <span class="font-medium">Estação</span>
+                    <div class="text-xs font-bold">$200</div>
+                </div>
+                <div class="property property-group-6" style="grid-column: 5; grid-row: 11;">
+                    <span class="font-medium">Ipanema</span>
+                    <div class="text-xs font-bold">$350</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 4; grid-row: 11; background-color: #ffeb99;">
+                    <i class="fas fa-gavel text-2xl mb-1 text-amber-800"></i>
+                    <span class="font-medium">Imposto</span>
+                    <div class="text-xs font-bold">$100</div>
+                </div>
+                <div class="property property-group-6" style="grid-column: 3; grid-row: 11;">
+                    <span class="font-medium">Leblon</span>
+                    <div class="text-xs font-bold">$400</div>
+                    <div class="property-houses"></div>
+                </div>
+                
+                <!-- Left Column -->
+                <div class="property property-group-7" style="grid-column: 1; grid-row: 9;">
+                    <span class="font-medium">Av. Brigadeiro Faria Lima</span>
+                    <div class="text-xs font-bold">$350</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property property-group-7" style="grid-column: 1; grid-row: 8;">
+                    <span class="font-medium">Av. Rebouças</span>
+                    <div class="text-xs font-bold">$320</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 1; grid-row: 7; background-color: #e6e6fa;">
+                    <i class="fas fa-train text-2xl mb-1 text-purple-800"></i>
+                    <span class="font-medium">Estação</span>
+                    <div class="text-xs font-bold">$200</div>
+                </div>
+                <div class="property property-group-7" style="grid-column: 1; grid-row: 6;">
+                    <span class="font-medium">Av. 9 de Julho</span>
+                    <div class="text-xs font-bold">$300</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 1; grid-row: 5; background-color: #e6f7ff;">
+                    <i class="fas fa-lightbulb text-2xl mb-1 text-blue-600"></i>
+                    <span class="font-medium">Companhia</span>
+                    <div class="text-xs font-bold">$150</div>
+                </div>
+                <div class="property property-group-8" style="grid-column: 1; grid-row: 4;">
+                    <span class="font-medium">Av. Pacaembu</span>
+                    <div class="text-xs font-bold">$280</div>
+                    <div class="property-houses"></div>
+                </div>
+                <div class="property" style="grid-column: 1; grid-row: 3; background-color: #ffcccb;">
+                    <i class="fas fa-question text-2xl mb-1 text-red-600"></i>
+                    <span class="font-medium">Sorte/Reves</span>
+                </div>
+                
+                <!-- Center Dice System -->
+                <div class="dice-container">
+                    <div class="dice" id="dice-display">
+                        <i class="fas fa-dice"></i>
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <div class="dice-value" id="dice-total-display">0</div>
+                </div>
+                
+                <!-- Center Logo -->
+                <div class="center-logo">
+                    <div class="text-4xl font-bold text-indigo-800">MONOPOLY</div>
+                </div>
+                
+                <!-- Player Tokens -->
+                <div class="player-token bg-red-500" id="token-1"></div>
+                <div class="player-token bg-blue-500" id="token-2"></div>
+                <div class="player-token bg-green-500" id="token-3"></div>
+                <div class="player-token bg-yellow-500" id="token-4"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for actions -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="modal-title">Ação</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-body">
+                <p id="modal-message" class="text-gray-700 mb-4"></p>
+                <div id="modal-actions" class="mt-4 flex justify-center space-x-4">
+                    <!-- Actions will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dice Roll Modal -->
+    <div id="dice-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-center">Lançando Dados...</h3>
+            <div class="dice flex justify-center" id="dice-result">
+                <i class="fas fa-dice fa-spin text-5xl"></i>
+                <i class="fas fa-dice fa-spin text-5xl"></i>
+            </div>
+            <div class="text-center mt-4">
+                <p id="dice-total" class="text-2xl font-bold text-indigo-700"></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        const gameState = {
+            players: [
+                { id: 1, name: "Jogador 1", balance: 1500, position: 0, color: "red", properties: [], inJail: false },
+                { id: 2, name: "Jogador 2", balance: 1500, position: 0, color: "blue", properties: [], inJail: false },
+                { id: 3, name: "Jogador 3", balance: 1500, position: 0, color: "green", properties: [], inJail: false },
+                { id: 4, name: "Jogador 4", balance: 1500, position: 0, color: "yellow", properties: [], inJail: false }
+            ],
+            currentPlayerIndex: 0,
+            properties: [
+                { id: 0, name: "Partida", price: 0, group: "corner", type: "start" },
+                { id: 1, name: "Leblon", price: 100, group: 1, rent: [6, 30, 90, 270, 400, 550], owner: null, houses: 0 },
+                { id: 2, name: "Av. Vieira Souto", price: 100, group: 1, rent: [6, 30, 90, 270, 400, 550], owner: null, houses: 0 },
+                { id: 3, name: "Sorte/Reves", price: 0, group: "chance", type: "chance" },
+                { id: 4, name: "Av. N.S. Copacabana", price: 120, group: 2, rent: [8, 40, 100, 300, 450, 600], owner: null, houses: 0 },
+                { id: 5, name: "Estação", price: 200, group: "railroad", rent: [25, 50, 100, 200], owner: null },
+                { id: 6, name: "Av. Presidente Vargas", price: 140, group: 2, rent: [10, 50, 150, 450, 625, 750], owner: null, houses: 0 },
+                { id: 7, name: "Av. Rio Branco", price: 160, group: 2, rent: [12, 60, 180, 500, 700, 900], owner: null, houses: 0 },
+                { id: 8, name: "Interlagos", price: 180, group: 3, rent: [14, 70, 200, 550, 750, 950], owner: null, houses: 0 },
+                { id: 9, name: "Prisão", price: 0, group: "corner", type: "jail" },
+                { id: 10, name: "Morumbi", price: 180, group: 3, rent: [14, 70, 200, 550, 750, 950], owner: null, houses: 0 },
+                { id: 11, name: "Companhia", price: 150, group: "utility", rent: [4, 10], owner: null },
+                { id: 12, name: "Flamengo", price: 200, group: 3, rent: [16, 80, 220, 600, 800, 1000], owner: null, houses: 0 },
+                { id: 13, name: "Botafogo", price: 220, group: 4, rent: [18, 90, 250, 700, 875, 1050], owner: null, houses: 0 },
+                { id: 14, name: "Estação", price: 200, group: "railroad", rent: [25, 50, 100, 200], owner: null },
+                { id: 15, name: "Av. Brasil", price: 240, group: 4, rent: [20, 100, 300, 750, 925, 1100], owner: null, houses: 0 },
+                { id: 16, name: "Av. Paulista", price: 260, group: 4, rent: [22, 110, 330, 800, 975, 1150], owner: null, houses: 0 },
+                { id: 17, name: "Parada Livre", price: 0, group: "corner", type: "free" },
+                { id: 18, name: "Jardim Europa", price: 280, group: 5, rent: [24, 120, 360, 850, 1025, 1200], owner: null, houses: 0 },
+                { id: 19, name: "Sorte/Reves", price: 0, group: "chance", type: "chance" },
+                { id: 20, name: "Copacabana", price: 300, group: 5, rent: [26, 130, 390, 900, 1100, 1275], owner: null, houses: 0 },
+                { id: 21, name: "Av. Atlântica", price: 320, group: 5, rent: [28, 150, 450, 1000, 1200, 1400], owner: null, houses: 0 },
+                { id: 22, name: "Estação", price: 200, group: "railroad", rent: [25, 50, 100, 200], owner: null },
+                { id: 23, name: "Ipanema", price: 350, group: 6, rent: [35, 175, 500, 1100, 1300, 1500], owner: null, houses: 0 },
+                { id: 24, name: "Imposto", price: 0, group: "tax", type: "tax", amount: 100 },
+                { id: 25, name: "Leblon", price: 400, group: 6, rent: [50, 200, 600, 1400, 1700, 2000], owner: null, houses: 0 },
+                { id: 26, name: "Av. Brigadeiro Faria Lima", price: 350, group: 7, rent: [35, 175, 500, 1100, 1300, 1500], owner: null, houses: 0 },
+                { id: 27, name: "Av. Rebouças", price: 320, group: 7, rent: [28, 150, 450, 1000, 1200, 1400], owner: null, houses: 0 },
+                { id: 28, name: "Estação", price: 200, group: "railroad", rent: [25, 50, 100, 200], owner: null },
+                { id: 29, name: "Av. 9 de Julho", price: 300, group: 7, rent: [26, 130, 390, 900, 1100, 1275], owner: null, houses: 0 },
+                { id: 30, name: "Companhia", price: 150, group: "utility", rent: [4, 10], owner: null },
+                { id: 31, name: "Av. Pacaembu", price: 280, group: 8, rent: [24, 120, 360, 850, 1025, 1200], owner: null, houses: 0 },
+                { id: 32, name: "Sorte/Reves", price: 0, group: "chance", type: "chance" }
+            ],
+            diceRolled: false
+        };
+        
+        // DOM elements
+        const currentPlayerEl = document.getElementById('current-player');
+        const currentBalanceEl = document.getElementById('current-balance');
+        const rollDiceBtn = document.getElementById('roll-dice');
+        const endTurnBtn = document.getElementById('end-turn');
+        const gameLogEl = document.getElementById('game-log');
+        const actionModal = document.getElementById('action-modal');
+        const diceModal = document.getElementById('dice-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalActions = document.getElementById('modal-actions');
+        const closeModalBtn = document.getElementById('close-modal');
+        const diceResult = document.getElementById('dice-result');
+        const diceTotal = document.getElementById('dice-total');
+        const diceDisplay = document.getElementById('dice-display');
+        const diceTotalDisplay = document.getElementById('dice-total-display');
+        
+        // Initialize game
+        function initGame() {
+            updatePlayerInfo();
+            positionTokens();
+            updateHealthBars();
+            
+            // Event listeners
+            rollDiceBtn.addEventListener('click', rollDice);
+            endTurnBtn.addEventListener('click', endTurn);
+            closeModalBtn.addEventListener('click', closeModal);
+            
+            addToGameLog("Jogo iniciado! O primeiro jogador é " + gameState.players[0].name);
+        }
+        
+        // Update player info display
+        function updatePlayerInfo() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            currentPlayerEl.textContent = currentPlayer.name;
+            currentPlayerEl.className = font-bold text-${currentPlayer.color}-600;
+            currentBalanceEl.textContent = currentPlayer.balance;
+            
+            // Update all player balances
+            gameState.players.forEach(player => {
+                document.getElementById(balance-${player.id}).textContent = player.balance;
+            });
+            
+            updateHealthBars();
+        }
+        
+        // Update health bars based on player balance
+        function updateHealthBars() {
+            gameState.players.forEach(player => {
+                const healthBar = document.getElementById(health-${player.id});
+                const percentage = Math.min(100, (player.balance / 1500) * 100);
+                healthBar.style.width = ${percentage}%;
+            });
+        }
+        
+        // Position player tokens on the board
+        function positionTokens() {
+            gameState.players.forEach(player => {
+                const token = document.getElementById(token-${player.id});
+                const position = player.position;
+                
+                // Calculate position on board (simplified for this example)
+                // In a real implementation, you'd need more complex logic to position tokens
+                // based on the actual board layout
+                let row, col;
+                
+                if (position <= 8) {
+                    // Top row
+                    row = 1;
+                    col = position + 2;
+                } else if (position <= 16) {
+                    // Right column
+                    row = position - 7;
+                    col = 11;
+                } else if (position <= 24) {
+                    // Bottom row
+                    row = 11;
+                    col = 26 - position;
+                } else {
+                    // Left column
+                    row = 33 - position;
+                    col = 1;
+                }
+                
+                token.style.gridRow = row;
+                token.style.gridColumn = col;
+            });
+        }
+        
+        // Roll dice
+        function rollDice() {
+            if (gameState.diceRolled) {
+                showModal("Ação inválida", "Você já lançou os dados neste turno.");
+                return;
+            }
+            
+            // Show rolling animation
+            diceModal.style.display = "block";
+            diceResult.innerHTML = '<i class="fas fa-dice fa-spin text-5xl"></i><i class="fas fa-dice fa-spin text-5xl"></i>';
+            diceTotal.textContent = "";
+            
+            // Simulate dice roll with delay
+            setTimeout(() => {
+                const die1 = Math.floor(Math.random() * 6) + 1;
+                const die2 = Math.floor(Math.random() * 6) + 1;
+                const total = die1 + die2;
+                
+                diceResult.innerHTML = <i class="fas fa-dice-${die1} text-5xl"></i> <i class="fas fa-dice-${die2} text-5xl"></i>;
+                diceTotal.textContent = Total: ${total};
+                
+                // Update center dice display
+                diceDisplay.innerHTML = <i class="fas fa-dice-${die1}"></i><i class="fas fa-dice-${die2}"></i>;
+                diceTotalDisplay.textContent = total;
+                
+                // Close dice modal after a delay
+                setTimeout(() => {
+                    diceModal.style.display = "none";
+                    movePlayer(total);
+                }, 1500);
+                
+                gameState.diceRolled = true;
+                endTurnBtn.disabled = false;
+                
+                addToGameLog(${gameState.players[gameState.currentPlayerIndex].name} lançou os dados e obteve ${total}.);
+            }, 1000);
+        }
+        
+        // Move player
+        function movePlayer(spaces) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            player.position = (player.position + spaces) % 32;
+            
+            // Check if passed start
+            if (player.position < spaces) {
+                player.balance += 200;
+                addToGameLog(${player.name} passou pela partida e recebeu $200.);
+                updatePlayerInfo();
+            }
+            
+            positionTokens();
+            checkLandingPosition();
+        }
+        
+        // Check what happens when player lands on a position
+        function checkLandingPosition() {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            const property = gameState.properties[player.position];
+            
+            switch (property.type) {
+                case "start":
+                    // Nothing happens
+                    break;
+                case "jail":
+                    // Just visiting
+                    showModal("Prisão", "Você está apenas visitando a prisão.");
+                    break;
+                case "free":
+                    // Free parking
+                    showModal("Parada Livre", "Aproveite para descansar!");
+                    break;
+                case "tax":
+                    // Pay tax
+                    payTax(property.amount);
+                    break;
+                case "chance":
+                    // Chance card
+                    drawChanceCard();
+                    break;
+                default:
+                    // Property
+                    if (property.owner === null) {
+                        // Unowned property - offer to buy
+                        offerPurchase(property);
+                    } else if (property.owner !== player.id) {
+                        // Owned by another player - pay rent
+                        payRent(property);
+                    } else {
+                        // Owned by current player
+                        showModal("Propriedade", Você já é dono de ${property.name}.);
+                    }
+            }
+        }
+        
+        // Offer property purchase
+        function offerPurchase(property) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            
+            if (player.balance >= property.price) {
+                modalTitle.textContent = "Comprar Propriedade";
+                modalMessage.textContent = Deseja comprar ${property.name} por $${property.price}?;
+                
+                modalActions.innerHTML = `
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg" id="buy-property">
+                        <i class="fas fa-check mr-2"></i>Comprar
+                    </button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg" id="decline-property">
+                        <i class="fas fa-times mr-2"></i>Recusar
+                    </button>
+                `;
+                
+                document.getElementById('buy-property').addEventListener('click', () => {
+                    buyProperty(property);
+                    closeModal();
+                });
+                
+                document.getElementById('decline-property').addEventListener('click', () => {
+                    addToGameLog(${player.name} recusou comprar ${property.name}.);
+                    closeModal();
+                });
+                
+                actionModal.style.display = "block";
+            } else {
+                showModal("Sem dinheiro", Você não tem dinheiro suficiente para comprar ${property.name}.);
+            }
+        }
+        
+        // Buy property
+        function buyProperty(property) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            
+            player.balance -= property.price;
+            property.owner = player.id;
+            player.properties.push(property.id);
+            
+            updatePlayerInfo();
+            addToGameLog(${player.name} comprou ${property.name} por $${property.price}.);
+            
+            // Update property display (in a real game, you'd show ownership visually)
+        }
+        
+        // Pay rent
+        function payRent(property) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            const owner = gameState.players.find(p => p.id === property.owner);
+            
+            let rentAmount;
+            
+            if (property.group === "railroad") {
+                // Rent for railroads depends on number owned
+                const ownedRailroads = owner.properties.filter(propId => 
+                    gameState.properties[propId].group === "railroad").length;
+                rentAmount = property.rent[ownedRailroads - 1];
+            } else if (property.group === "utility") {
+                // Utility rent depends on dice roll (simplified here)
+                const diceRoll = Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1;
+                const ownedUtilities = owner.properties.filter(propId => 
+                    gameState.properties[propId].group === "utility").length;
+                rentAmount = diceRoll * property.rent[ownedUtilities - 1];
+            } else {
+                // Regular property rent
+                rentAmount = property.houses === 0 ? property.rent[0] : 
+                             property.houses === 5 ? property.rent[5] : // Hotel
+                             property.rent[property.houses];
+            }
+            
+            player.balance -= rentAmount;
+            owner.balance += rentAmount;
+            
+            updatePlayerInfo();
+            addToGameLog(${player.name} pagou $${rentAmount} de aluguel para ${owner.name} por ${property.name}.);
+            
+            showModal("Pagamento de Aluguel", Você pagou $${rentAmount} de aluguel para ${owner.name}.);
+            
+            // Check if player is bankrupt
+            if (player.balance < 0) {
+                handleBankruptcy(player, owner);
+            }
+        }
+        
+        // Pay tax
+        function payTax(amount) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            
+            player.balance -= amount;
+            updatePlayerInfo();
+            addToGameLog(${player.name} pagou $${amount} de imposto.);
+            
+            showModal("Imposto", Você pagou $${amount} de imposto.);
+            
+            // Check if player is bankrupt
+            if (player.balance < 0) {
+                handleBankruptcy(player, null);
+            }
+        }
+        
+        // Draw chance card
+        function drawChanceCard() {
+            const cards = [
+                "Avance até a Partida e receba $200.",
+                "Você ganhou um concurso de beleza! Receba $100.",
+                "Pague $50 para cada jogador.",
+                "Você foi eleito presidente do conselho. Pague $50 para cada jogador.",
+                "Sua construção e empréstimo maturam. Receba $150.",
+                "Vá para a prisão. Não passe pela partida.",
+                "Receba $20 de cada jogador.",
+                "Pague $100 de impostos.",
+                "Avance até a Av. Paulista.",
+                "Avance até a Av. Vieira Souto."
+            ];
+            
+            const card = cards[Math.floor(Math.random() * cards.length)];
+            showModal("Sorte/Reves", card);
+            addToGameLog(${gameState.players[gameState.currentPlayerIndex].name} tirou a carta: ${card});
+            
+            // In a full implementation, you'd need to handle the card effects
+        }
+        
+        // Handle bankruptcy
+        function handleBankruptcy(player, creditor) {
+            showModal("Falência", ${player.name} faliu!);
+            addToGameLog(${player.name} faliu e está fora do jogo!);
+            
+            // Transfer properties to creditor (if any)
+            if (creditor) {
+                player.properties.forEach(propId => {
+                    const prop = gameState.properties[propId];
+                    prop.owner = creditor.id;
+                    creditor.properties.push(propId);
+                });
+                
+                addToGameLog(Todas as propriedades de ${player.name} foram transferidas para ${creditor.name}.);
+            }
+            
+            // Remove player from game
+            gameState.players = gameState.players.filter(p => p.id !== player.id);
+            
+            // Check if game is over
+            if (gameState.players.length === 1) {
+                endGame(gameState.players[0]);
+                return;
+            }
+            
+            // Adjust current player index if needed
+            if (gameState.currentPlayerIndex >= gameState.players.length) {
+                gameState.currentPlayerIndex = 0;
+            }
+            
+            endTurn();
+        }
+        
+        // End game
+        function endGame(winner) {
+            showModal("Fim de Jogo", ${winner.name} venceu o jogo! Parabéns!);
+            addToGameLog(FIM DE JOGO! ${winner.name} é o vencedor!);
+            
+            rollDiceBtn.disabled = true;
+            endTurnBtn.disabled = true;
+        }
+        
+        // End turn
+        function endTurn() {
+            gameState.diceRolled = false;
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+            endTurnBtn.disabled = true;
+            
+            updatePlayerInfo();
+            addToGameLog(Turno de ${gameState.players[gameState.currentPlayerIndex].name}.);
+        }
+        
+        // Show modal
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalActions.innerHTML = "";
+            
+            const okBtn = document.createElement("button");
+            okBtn.className = "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg";
+            okBtn.innerHTML = '<i class="fas fa-check mr-2"></i>OK';
+            okBtn.addEventListener('click', closeModal);
+            
+            modalActions.appendChild(okBtn);
+            actionModal.style.display = "block";
+        }
+        
+        // Close modal
+        function closeModal() {
+            actionModal.style.display = "none";
+            diceModal.style.display = "none";
+        }
+        
+        // Add message to game log
+        function addToGameLog(message) {
+            const logEntry = document.createElement("div");
+            logEntry.className = "mb-1";
+            logEntry.textContent = message;
+            gameLogEl.appendChild(logEntry);
+            gameLogEl.scrollTop = gameLogEl.scrollHeight;
+        }
+        
+        // Start the game
+        initGame();
+    </script>
 </body>
 </html>
-
-

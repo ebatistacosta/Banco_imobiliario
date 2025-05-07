@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+        
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface do Jogador</title>
+    <script>
+        const serverUrl = "wss://meujogo.com/ws";
+        const playerId = new URLSearchParams(window.location.search).get("jogador");
+
+        const socket = new WebSocket(serverUrl);
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === "update" && data.payload.playerId == playerId) {
+                updatePlayerInterface(data.payload);
+            }
+        };
+
+        function updatePlayerInterface(payload) {
+            document.getElementById("balance").textContent = payload.balance;
+            document.getElementById("properties").textContent = payload.properties.join(", ");
+        }
+    </script>
+</head>
+<body>
+    
+    <h1>Jogador <span id="player-id"></span></h1>
+    <p>Saldo: $<span id="balance">0</span></p>
+    <p>Propriedades: <span id="properties">Nenhuma</span></p>
+</body>
+    
+</html>

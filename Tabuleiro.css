@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    background: #f0f0f0;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .board {
+    display: grid;
+    grid-template-columns: repeat(11, 70px);
+    grid-template-rows: repeat(11, 70px);
+    gap: 2px;
+    background-color: #222;
+    padding: 5px;
+    border: 5px solid #000;
+  }
+  
+  /* Estilo base para as casas */
+  .cell {
+    background-color: #fff;
+    border: 2px solid #444;
+    font-size: 10px;
+    font-weight: bold;
+    color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4px;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
+  }
+  
+  /* Estilos por tipo */
+  .corner {
+    background: linear-gradient(135deg, #eeeeee, #cccccc);
+    border: 3px solid #000;
+  }
+  
+  .residencia {
+    background-color: #81c784;
+    border-color: #388e3c;
+    color: #fff;
+  }
+  
+  .industria {
+    background-color: #ffb74d;
+    border-color: #ef6c00;
+    color: #fff;
+  }
+  
+  .especial {
+    background-color: #4fc3f7;
+    border-color: #0288d1;
+    color: #fff;
+  }
+  
+  /* Texto vertical para colunas laterais */
+  .cell[style*="grid-column: 1;"],
+  .cell[style*="grid-column: 11;"] {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    font-size: 9px;
+  }
+  
